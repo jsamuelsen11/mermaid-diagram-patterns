@@ -1,0 +1,6 @@
+# shfmt flags (read automatically by shfmt 3.x when present in the project root).
+--indent 2
+--binary-next-line
+--case-indent
+--space-redirects
+--language-dialect bash

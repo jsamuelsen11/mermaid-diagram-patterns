@@ -1,0 +1,29 @@
+# yamllint: lint layer on top of Prettier's formatting.
+extends: default
+
+ignore-from-file: .gitignore
+
+rules:
+  line-length:
+    max: 120
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+  document-start: disable
+  truthy:
+    # GitHub Actions uses `on:`; allow the unquoted key.
+    check-keys: false
+    allowed-values: ["true", "false"]
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+  quoted-strings:
+    # Prettier owns quote style (double unless the value contains double quotes); yamllint only
+    # rejects the mix of quoting conventions that Prettier would not touch.
+    quote-type: any
+    required: false

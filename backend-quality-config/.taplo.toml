@@ -1,0 +1,27 @@
+# taplo: TOML formatter and linter.
+include = ["**/*.toml"]
+exclude = ["**/build/**", "node_modules/**"]
+
+[formatting]
+align_entries = false
+align_comments = true
+array_trailing_comma = true
+array_auto_expand = true
+array_auto_collapse = false
+compact_arrays = true
+compact_inline_tables = false
+column_width = 120
+indent_tables = false
+indent_entries = false
+indent_string = "  "
+reorder_keys = false
+reorder_arrays = false
+allowed_blank_lines = 2
+trailing_newline = true
+crlf = false
+
+[[rule]]
+include = ["gradle/libs.versions.toml"]
+[rule.formatting]
+# Version catalogs read better grouped by hand than sorted.
+reorder_keys = false

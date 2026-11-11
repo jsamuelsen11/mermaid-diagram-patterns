@@ -1,0 +1,35 @@
+# Prettier formats YAML, JSON, JSON5, XML, JMX and .properties here.
+# Markdown is owned by rumdl, Java and Kotlin by Spotless, shell by shfmt, TOML by taplo.
+printWidth: 120
+tabWidth: 2
+useTabs: false
+endOfLine: lf
+singleQuote: false
+bracketSameLine: false
+
+plugins:
+  - "@prettier/plugin-xml"
+  - prettier-plugin-properties
+
+# XML plugin defaults (apply to *.xml and overrides below)
+xmlWhitespaceSensitivity: ignore
+xmlSelfClosingSpace: true
+xmlSortAttributesByKey: false
+xmlQuoteAttributes: double
+
+# .properties plugin
+keySeparator: "="
+
+overrides:
+  - files: ["*.json5", "*.jsonc"]
+    options:
+      parser: json5
+      quoteProps: preserve
+      singleQuote: false
+      trailingComma: none
+  - files: ["*.jmx", "*.xsd", "*.xsl", "*.xslt", "*.wsdl"]
+    options:
+      parser: xml
+  - files: ["*.properties"]
+    options:
+      parser: dot-properties

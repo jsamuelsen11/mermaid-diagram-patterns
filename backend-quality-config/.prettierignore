@@ -1,0 +1,6 @@
+# Prettier already honours .gitignore; this adds files that are tracked but must not be reformatted.
+package-lock.json
+gradle/wrapper/
+**/build/
+**/generated/
+CHANGELOG.md

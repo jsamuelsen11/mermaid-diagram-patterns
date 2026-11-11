@@ -1,0 +1,19 @@
+# Redocly CLI: OpenAPI linting. https://redocly.com/docs/cli/rules
+extends:
+  - recommended
+
+rules:
+  operation-operationId: error
+  operation-summary: error
+  operation-description: warn
+  operation-4xx-response: error
+  no-unused-components: error
+  no-ambiguous-paths: error
+  path-params-defined: error
+  spec-strict-refs: error
+  security-defined: error
+  info-license: warn
+  tag-description: warn
+  no-server-trailing-slash: error
+  operation-tag-defined: error
+  paths-kebab-case: warn

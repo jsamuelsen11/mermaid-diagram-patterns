@@ -1,0 +1,77 @@
+# EditorConfig: https://editorconfig.org
+# Enforced by editorconfig-checker in pre-commit and honoured by every formatter below.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+max_line_length = 120
+
+# --- JVM ------------------------------------------------------------------
+[*.java]
+indent_size = 4
+ij_continuation_indent_size = 8
+ij_java_imports_layout = *, |, javax.**, java.**, |, $*
+ij_java_class_count_to_use_import_on_demand = 999
+ij_java_names_count_to_use_import_on_demand = 999
+
+[*.{kt,kts}]
+indent_size = 4
+ij_continuation_indent_size = 4
+ij_kotlin_imports_layout = *, java.**, javax.**, kotlin.**, ^
+
+[*.groovy]
+indent_size = 4
+
+[*.properties]
+# Spring application.properties and friends
+indent_size = 4
+
+[*.sql]
+indent_size = 4
+
+# --- Data and config ------------------------------------------------------
+[*.{json,json5,jsonc}]
+indent_size = 2
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.toml]
+indent_size = 2
+
+[*.{xml,xsd,xsl,xslt,wsdl,jmx}]
+indent_size = 2
+
+# --- Docs -----------------------------------------------------------------
+[*.{md,markdown}]
+# Two trailing spaces are a hard line break in Markdown.
+trim_trailing_whitespace = false
+max_line_length = off
+
+# --- Containers and shell -------------------------------------------------
+[{Dockerfile,Dockerfile.*,*.Dockerfile,*.dockerfile,Containerfile}]
+indent_size = 4
+
+[*.{sh,bash,zsh}]
+indent_size = 2
+switch_case_indent = true
+
+[Makefile]
+indent_style = tab
+
+# --- Windows-only files ---------------------------------------------------
+[*.{bat,cmd}]
+end_of_line = crlf
+
+# --- Generated or vendored ------------------------------------------------
+[gradlew]
+end_of_line = lf
+
+[{package-lock.json,*.min.*}]
+indent_size = unset
+insert_final_newline = unset

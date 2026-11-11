@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE suppressions PUBLIC "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+  "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<suppressions>
+  <!-- Generated sources are never ours to fix. -->
+  <suppress files="[\\/]build[\\/]generated[\\/]" checks=".*" />
+
+  <!-- Spring Boot entry points hold only main(); they are not utility classes. -->
+  <suppress files="[\\/][A-Za-z0-9]*Application\.java$" checks="HideUtilityClassConstructor" />
+
+  <!-- Tests: long descriptive method names, relaxed structure, static imports for fluency. -->
+  <suppress
+    files="[\\/]src[\\/](test|integrationTest)[\\/]"
+    checks="MethodName|MethodLength|JavadocMethod|VisibilityModifier|IllegalType|MagicNumber"
+  />
+</suppressions>

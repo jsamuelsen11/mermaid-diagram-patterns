@@ -1,0 +1,37 @@
+# typos: source-code spell checker. https://github.com/crate-ci/typos
+[files]
+extend-exclude = [
+  "*.jar",
+  "*.zip",
+  "*.gz",
+  "*.png",
+  "*.jpg",
+  "*.jpeg",
+  "*.gif",
+  "*.ico",
+  "*.pdf",
+  "*.p12",
+  "*.jks",
+  "package-lock.json",
+  "gradle/wrapper/",
+  "**/build/",
+  "**/generated/",
+  "*.jmx",
+  "*.min.*",
+  "CHANGELOG.md",
+]
+ignore-hidden = false
+
+[default]
+extend-ignore-re = [
+  # hex, base64-ish and UUID-like tokens
+  "[0-9a-fA-F]{7,}",
+  "[A-Za-z0-9+/]{40,}={0,2}",
+  "(?i)[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+  # inline opt-out:  // spellchecker:disable-line
+  "(?Rm)^.*(#|//)\\s*spellchecker:disable-line$",
+]
+
+[default.extend-words]
+# Project vocabulary that typos would otherwise flag goes here, e.g.
+# ser = "ser"

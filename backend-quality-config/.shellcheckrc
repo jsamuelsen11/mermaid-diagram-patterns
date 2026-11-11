@@ -1,0 +1,4 @@
+# shellcheck: https://www.shellcheck.net/wiki
+enable=add-default-case,avoid-nullary-conditions,check-unassigned-uppercase,deprecate-which,quote-safe-variables
+source-path=SCRIPTDIR
+shell=bash

@@ -1,0 +1,172 @@
+# Lefthook: https://lefthook.dev
+#
+# Design
+#   pre-commit  fast, staged files only, formatters re-stage what they fix, groups run in parallel
+#   commit-msg  Conventional Commits via commitlint
+#   pre-push    tests and a secret scan of the commits about to leave the machine
+#
+# Every command is also reachable through `mise run ...` so CI and humans get identical behaviour.
+# `lefthook run pre-commit --all-files` (alias `mise run lint`) uses `git ls-files`, so .gitignore is honoured.
+min_version: 2.2.0
+
+# Sourced by the generated hook wrapper. Git runs hooks with the worktree root as the working directory,
+# so $PWD resolves to the repo. A bare filename would make POSIX sh search PATH instead, and lefthook
+# strips a leading "./" when it regenerates hooks, hence the shell expression.
+rc: '"$PWD/.lefthookrc"'
+
+output:
+  - summary
+  - failure
+  - execution_info
+
+pre-commit:
+  parallel: true
+  jobs:
+    # ---------------------------------------------------------------- JVM --
+    - name: java
+      group:
+        piped: true
+        jobs:
+          - name: spotless (palantir-java-format)
+            glob: "*.java"
+            run: ./gradlew --quiet spotlessJavaApply "-PspotlessTargets=$(printf '%s' '{staged_files}' | tr ' ' ',')"
+            stage_fixed: true
+          - name: compile + error prone + nullaway + checkstyle
+            glob: "*.java"
+            run: ./gradlew --quiet checkstyleMain checkstyleTest
+
+    - name: gradle kotlin dsl
+      glob: "*.gradle.kts"
+      run: ./gradlew --quiet spotlessKotlinGradleApply
+      stage_fixed: true
+
+    # ----------------------------------------------------------- Markdown --
+    - name: markdown
+      glob: "*.{md,markdown}"
+      run: rumdl check --fix {staged_files}
+      stage_fixed: true
+
+    # --------------------------------------------------------------- YAML --
+    - name: yaml
+      glob: "*.{yml,yaml}"
+      group:
+        piped: true
+        jobs:
+          - name: prettier
+            run: prettier --write --log-level warn {staged_files}
+            stage_fixed: true
+          - name: yamllint
+            run: yamllint --strict {staged_files}
+
+    - name: github workflows
+      glob: ".github/workflows/*.{yml,yaml}"
+      group:
+        jobs:
+          - name: actionlint
+            run: actionlint {staged_files}
+          - name: schema
+            run: check-jsonschema --builtin-schema vendor.github-workflows {staged_files}
+
+    - name: dependabot
+      glob: ".github/dependabot.{yml,yaml}"
+      run: check-jsonschema --builtin-schema vendor.dependabot {staged_files}
+
+    - name: docker compose
+      glob: "{compose,docker-compose}*.{yml,yaml}"
+      run: check-jsonschema --builtin-schema vendor.compose-spec {staged_files}
+
+    - name: openapi
+      glob: "{**/openapi*,**/swagger*,**/api/**/*}.{yml,yaml,json}"
+      run: redocly lint {staged_files}
+
+    # --------------------------------------------------------------- JSON --
+    - name: json
+      glob: "*.{json,json5,jsonc}"
+      exclude:
+        - package-lock.json
+      run: prettier --write --log-level warn {staged_files}
+      stage_fixed: true
+
+    - name: renovate config
+      glob: "{renovate.json,renovate.json5,.renovaterc,.renovaterc.json,.github/renovate.json}"
+      run: check-jsonschema --builtin-schema vendor.renovate {staged_files}
+
+    # ---------------------------------------------------------------- XML --
+    - name: xml
+      glob: "*.{xml,xsd,xsl,xslt,wsdl,jmx}"
+      group:
+        piped: true
+        jobs:
+          - name: prettier
+            run: prettier --write --log-level warn {staged_files}
+            stage_fixed: true
+          - name: well-formed
+            run: xmllint --noout {staged_files}
+
+    # --------------------------------------------------------- Properties --
+    - name: properties
+      glob: "*.properties"
+      run: prettier --write --log-level warn {staged_files}
+      stage_fixed: true
+
+    # --------------------------------------------------------------- TOML --
+    - name: toml
+      glob: "*.toml"
+      group:
+        piped: true
+        jobs:
+          - name: taplo format
+            run: taplo format {staged_files}
+            stage_fixed: true
+          - name: taplo lint
+            run: taplo lint {staged_files}
+
+    # ------------------------------------------------------------- Docker --
+    - name: dockerfile
+      glob: "{Dockerfile,Dockerfile.*,*.Dockerfile,*.dockerfile,Containerfile}"
+      run: hadolint {staged_files}
+
+    # -------------------------------------------------------------- Shell --
+    - name: shell
+      glob: "*.{sh,bash}"
+      group:
+        piped: true
+        jobs:
+          - name: shfmt
+            run: shfmt --write {staged_files}
+            stage_fixed: true
+          - name: shellcheck
+            run: shellcheck --external-sources {staged_files}
+
+    # ---------------------------------------------------- Cross-cutting ----
+    - name: editorconfig
+      run: editorconfig-checker {staged_files}
+
+    - name: typos
+      run: typos --force-exclude {staged_files}
+
+    - name: conflict markers and whitespace errors
+      run: git diff --cached --check
+
+    - name: no large files (>1 MiB)
+      run: |
+        status=0
+        for f in {staged_files}; do
+          if [ -f "$f" ] && [ "$(wc -c <"$f")" -gt 1048576 ]; then
+            echo "$f is larger than 1 MiB; use Git LFS or keep it out of the repo"; status=1
+          fi
+        done
+        exit $status
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: commitlint --edit {1}
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: gitleaks (commits not yet on any remote)
+      run: gitleaks git --no-banner --redact --log-opts="HEAD --not --remotes"
+    - name: tests
+      run: ./gradlew test

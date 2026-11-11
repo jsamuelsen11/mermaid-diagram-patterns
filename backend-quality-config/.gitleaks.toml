@@ -1,0 +1,20 @@
+# gitleaks: secret scanning. Extends the built-in ruleset.
+title = "repository gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Known non-secrets"
+paths = [
+  '''(^|/)package-lock\.json$''',
+  '''(^|/)gradle/wrapper/gradle-wrapper\.jar$''',
+  '''\.jmx$''',
+]
+# Matched against the detected secret value only (regexTarget defaults to "secret").
+regexes = [
+  # Spring Boot property placeholders such as ${DB_PASSWORD} or ${DB_PASSWORD:changeme}
+  '''^\$\{[A-Z0-9_]+(:[^}]*)?\}$''',
+  # Whole-value placeholders only; a real token that merely contains one of these words is still reported
+  '''(?i)^(changeme|change-me|example|dummy|placeholder|secret|password|todo)$''',
+]

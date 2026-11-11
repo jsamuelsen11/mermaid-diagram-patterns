@@ -1,0 +1,30 @@
+# Normalise line endings in the repository and on checkout.
+* text=auto eol=lf
+
+# Windows scripts must keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Gradle wrapper must stay executable with LF.
+gradlew text eol=lf
+
+# Binaries: never diff, never normalise.
+*.jar binary
+*.war binary
+*.zip binary
+*.gz binary
+*.tar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.p12 binary
+*.jks binary
+*.keystore binary
+
+# Keep generated lockfiles out of merge conflict churn.
+package-lock.json -diff merge=ours linguist-generated=true

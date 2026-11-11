@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":semanticCommits",
+    ":pinAllExceptPeerDependencies",
+    "helpers:pinGitHubActionDigests",
+    "group:allNonMajor"
+  ],
+  "schedule": ["before 6am on monday"],
+  "timezone": "UTC",
+  "labels": ["dependencies"],
+  "rangeStrategy": "pin",
+  "mise": { "enabled": true },
+  "gradle": { "enabled": true },
+  "npm": { "enabled": true },
+  "github-actions": { "enabled": true },
+  "dockerfile": { "enabled": true },
+  "docker-compose": { "enabled": true },
+  "packageRules": [
+    {
+      "description": "Quality tooling: auto-merge patch and minor once CI is green",
+      "matchManagers": ["mise", "npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Keep Java on the chosen LTS line",
+      "matchManagers": ["mise"],
+      "matchPackageNames": ["java"],
+      "allowedVersions": "/^temurin-25\\./"
+    },
+    {
+      "description": "Keep Node on the active LTS line",
+      "matchManagers": ["mise"],
+      "matchPackageNames": ["node"],
+      "allowedVersions": "<25"
+    },
+    {
+      "description": "Spring Boot majors get their own PR and a human review",
+      "matchPackageNames": ["org.springframework.boot", "org.springframework.boot:spring-boot-dependencies"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["dependencies", "spring-boot-major"]
+    }
+  ]
+}
